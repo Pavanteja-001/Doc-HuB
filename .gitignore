@@ -1,0 +1,31 @@
+
+backend/node_modules/
+frontend/node_modules/
+
+
+backend/.env
+
+*.log
+logs/
+npm-debug.log*
+yarn-error.log*
+yarn-debug.log*
+frontend/dist/
+frontend/build/
+backend/dist/
+backend/build/
+
+backend/uploads/
+frontend/public/uploads/
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ----------- VS Code -----------
+.vscode/
+
+# ----------- Temporary Files -----------
+*.temp
+*.tmp
+temp/
+tmp/
