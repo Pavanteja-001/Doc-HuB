@@ -1,7 +1,5 @@
-// frontend/src/components/Chat.js — FINAL COMPLETE VERSION
-
 import React, { useState, useEffect, useRef } from "react";
-// 🌟 CRITICAL FIX: Re-adding the Link import 🌟
+
 import { Link } from "react-router-dom";
 import API from "../api";
 
@@ -32,7 +30,7 @@ const Chat = () => {
       const res = await API.post(
         "/docs/ask",
         { question },
-        { headers: { Authorization: `Bearer ${token}` }, timeout: 60000 } // Long timeout for AI calls
+        { headers: { Authorization: `Bearer ${token}` }, timeout: 60000 }
       );
 
       const botMessage = {
@@ -54,7 +52,7 @@ const Chat = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
       <div className="max-w-4xl mx-auto p-6">
-        {/* 🌟 HEADER: APP NAME & BACK TO DASHBOARD LINK 🌟 */}
+        {/* HEADER: APP NAME & BACK TO DASHBOARD LINK  */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 flex justify-between items-center">
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
@@ -84,7 +82,7 @@ const Chat = () => {
             Back to Dashboard
           </Link>
         </div>
-        {/* 🌟 END HEADER 🌟 */}
+        {/* END HEADER  */}
 
         {/* Chat Container */}
         <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col h-96 md:h-[600px]">

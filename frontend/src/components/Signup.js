@@ -11,7 +11,7 @@ const Signup = () => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    setMsg(""); // clear previous message
+    setMsg("");
 
     try {
       const response = await API.post(
@@ -21,7 +21,7 @@ const Signup = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          // This forces Axios to send proper CORS headers
+
           withCredentials: true,
         }
       );

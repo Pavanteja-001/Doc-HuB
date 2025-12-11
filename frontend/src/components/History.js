@@ -1,4 +1,3 @@
-// frontend/src/components/History.js
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import API from "../api";

@@ -1,16 +1,11 @@
-// backend/utils/gemini.js - WITH RATE LIMITING & RETRY LOGIC
+/////// IT IS IMPLEMENTED BY GEMINI-SIMPLE.JS IT IS NOT WORKING MODULE ////////
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-// Initialize Gemini Client
 const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// Rate limiting helpers
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/**
- * Retry logic with exponential backoff for rate limit errors
- */
 async function retryWithBackoff(fn, maxRetries = 3, baseDelay = 2000) {
   for (let i = 0; i < maxRetries; i++) {
     try {
@@ -53,7 +48,6 @@ async function getEmbedding(text) {
   } catch (error) {
     console.error("Error generating embedding:", error);
 
-    // Fallback: Ultra-filter and retry
     try {
       console.log("Embedding failed. Retrying with ultra-filtered text...");
 
@@ -83,7 +77,7 @@ async function getEmbedding(text) {
 }
 
 /**
- * Generates a response using the RAG context.
+
  * @param {string} question User's question.
  * @param {Array<{text: string, docName: string}>} contextChunks Retrieved relevant chunks.
  * @returns {string} The AI-generated answer.

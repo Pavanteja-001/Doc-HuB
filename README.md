@@ -58,6 +58,7 @@ npm install
 MONGO_URI=your_mongodb_atlas_connection_string
 JWT_SECRET=your_very_long_random_secret_here_123456789
 GEMINI_API_KEY=AIzaSyxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
 PORT=5001
 
 Start backend:
@@ -72,6 +73,23 @@ npm start
 
 Open
 http://localhost:3000
+
+### API Routes & Implementation
+
+All routes are prefixed with:
+
+- `/auth` → Authentication
+- `/docs` → Document & AI operations
+
+| Method   | Endpoint        | Auth Required | Description                                  | Request Body / Params             | Success Response                            |
+| -------- | --------------- | ------------- | -------------------------------------------- | --------------------------------- | ------------------------------------------- |
+| `POST`   | `/auth/signup`  | No            | Create new user                              | `{ email, password }`             | `{ token }`                                 |
+| `POST`   | `/auth/login`   | No            | Login user                                   | `{ email, password }`             | `{ token }`                                 |
+| `POST`   | `/docs/upload`  | Yes           | Upload PDF/TXT/DOCX + extract text           | `multipart/form-data` with `file` | `{ message, documentId, name, textLength }` |
+| `GET`    | `/docs/list`    | Yes           | Get all user documents                       | -                                 | Array of documents                          |
+| `DELETE` | `/docs/:id`     | Yes           | Delete a document                            | Document ID in URL                | `{ message: "Deleted successfully" }`       |
+| `POST`   | `/docs/ask`     | Yes           | Ask AI question about all uploaded documents | `{ question }`                    | `{ answer, references[] }`                  |
+| `GET`    | `/docs/history` | Yes           | Get full query history (all documents)       | -                                 | Array of query objects                      |
 
 ### Database Schema Design (with Relationships)
 
@@ -93,7 +111,7 @@ erDiagram
         ObjectId _id PK
         ObjectId userId FK
         string name
-        string type "pdf | txt | docx"
+        string type "pdf | txt "
         string text
         string status "processing | ready | error"
         string filePath

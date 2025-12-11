@@ -4,7 +4,6 @@ require("./db");
 const express = require("express");
 const app = express();
 
-// FIXED CORS FOR VERCEL + RENDER
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   const allowedOrigins = [
@@ -30,7 +29,6 @@ app.use(express.json());
 app.use("/auth", require("./routes/auth"));
 app.use("/docs", require("./routes/documents"));
 
-// RENDER REQUIRES DYNAMIC PORT
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`BACKEND LIVE ON PORT ${PORT}`);

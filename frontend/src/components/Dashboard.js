@@ -1,5 +1,3 @@
-// frontend/src/components/Dashboard.js — FINAL COMPLETE VERSION
-
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import API from "../api";
@@ -38,7 +36,7 @@ const Dashboard = () => {
 
     try {
       const token = localStorage.getItem("token");
-      // Set a long timeout (60 seconds) for potentially long embedding process
+
       await API.post("/docs/upload", formData, {
         headers: { Authorization: `Bearer ${token}` },
         timeout: 60000,
@@ -52,7 +50,6 @@ const Dashboard = () => {
     }
   };
 
-  // Document Deletion Handler
   const handleDelete = async (docId, docName) => {
     if (
       !window.confirm(
@@ -100,13 +97,13 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      {/* 🌟 HEADER: APP NAME & LOGOUT BUTTON 🌟 */}
+      {/*  HEADER: APP NAME & LOGOUT BUTTON  */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <div className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               {/* Application Name */}
-              Document Intelligence and Knowledge Search Hub
+              DOC HUB
             </div>
             <span className="text-sm text-gray-500">DocIntel AI</span>
           </div>
@@ -131,7 +128,7 @@ const Dashboard = () => {
           </button>
         </div>
       </div>
-      {/* 🌟 END HEADER 🌟 */}
+      {/*  END HEADER */}
 
       <div className="max-w-7xl mx-auto px-6 py-10">
         {/* Upload Zone */}

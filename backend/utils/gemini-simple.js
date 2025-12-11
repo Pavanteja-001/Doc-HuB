@@ -1,21 +1,15 @@
-// backend/utils/gemini-simple.js - OPTIMIZED VERSION
-
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-/**
- * ENHANCED KEYWORD SEARCH with better scoring algorithm
- * Returns relevant documents ranked by relevance score
- */
 function simpleSearch(query, documents) {
   if (!query || !documents || documents.length === 0) {
-    console.log("⚠️ Search called with empty query or no documents");
+    console.log("Search called with empty query or no documents");
     return [];
   }
 
   const queryLower = query.toLowerCase();
-  // Extract meaningful words (3+ chars) and remove common stop words
+
   const stopWords = new Set([
     "the",
     "and",
@@ -36,16 +30,16 @@ function simpleSearch(query, documents) {
     .filter((w) => w.length > 2 && !stopWords.has(w));
 
   if (words.length === 0) {
-    console.log("⚠️ No meaningful keywords extracted from query");
+    console.log(" No meaningful keywords extracted from query");
     return documents.slice(0, 5);
   }
 
-  console.log(`🔍 Searching for keywords: [${words.join(", ")}]`);
+  console.log(` Searching for keywords: [${words.join(", ")}]`);
 
   const scoredDocs = documents
     .map((doc) => {
       if (!doc.text || typeof doc.text !== "string") {
-        console.log(`⚠️ Document ${doc.name} has no text content`);
+        console.log(`Document ${doc.name} has no text content`);
         return null;
       }
 
@@ -53,36 +47,30 @@ function simpleSearch(query, documents) {
       const textLower = doc.text.toLowerCase();
       const nameLower = (doc.name || "").toLowerCase();
 
-      // SCORING SYSTEM:
-
-      // 1. Exact phrase match (highest priority) = 200 points
       if (textLower.includes(queryLower)) {
         score += 200;
-        console.log(`✓ Exact match in ${doc.name}: +200`);
+        console.log(`Exact match in ${doc.name}: +200`);
       }
 
-      // 2. Title/filename relevance = 100 points per keyword
       words.forEach((word) => {
         if (nameLower.includes(word)) {
           score += 100;
-          console.log(`✓ Keyword "${word}" in filename ${doc.name}: +100`);
+          console.log(`Keyword "${word}" in filename ${doc.name}: +100`);
         }
       });
 
-      // 3. Individual keyword frequency in content
       words.forEach((word) => {
-        const regex = new RegExp(`\\b${word}\\b`, "gi"); // Word boundary matching
+        const regex = new RegExp(`\\b${word}\\b`, "gi");
         const matches = (textLower.match(regex) || []).length;
         if (matches > 0) {
-          const wordScore = Math.min(matches * 15, 150); // Cap at 150 per word
+          const wordScore = Math.min(matches * 15, 150);
           score += wordScore;
           console.log(
-            `✓ Keyword "${word}" found ${matches}x in ${doc.name}: +${wordScore}`
+            ` Keyword "${word}" found ${matches}x in ${doc.name}: +${wordScore}`
           );
         }
       });
 
-      // 4. Keyword proximity bonus (if multiple keywords appear close together)
       if (words.length > 1) {
         const positions = words
           .map((word) => textLower.indexOf(word))
@@ -90,9 +78,8 @@ function simpleSearch(query, documents) {
         if (positions.length > 1) {
           const maxDistance = Math.max(...positions) - Math.min(...positions);
           if (maxDistance < 500) {
-            // Within 500 chars
             score += 50;
-            console.log(`✓ Keywords clustered in ${doc.name}: +50`);
+            console.log(` Keywords clustered in ${doc.name}: +50`);
           }
         }
       }
@@ -102,40 +89,33 @@ function simpleSearch(query, documents) {
     .filter((item) => item !== null && item.score > 0)
     .sort((a, b) => b.score - a.score);
 
-  console.log(`📊 Found ${scoredDocs.length} relevant documents`);
+  console.log(`Found ${scoredDocs.length} relevant documents`);
   scoredDocs.slice(0, 5).forEach((item, i) => {
     console.log(`   ${i + 1}. ${item.doc.name} (score: ${item.score})`);
   });
 
-  // Return top 5 scoring documents
   const topDocs = scoredDocs.slice(0, 5).map((item) => item.doc);
 
-  // FALLBACK: If no matches, return all docs and log warning
   if (topDocs.length === 0) {
-    console.log("⚠️ No keyword matches - returning all documents as fallback");
+    console.log(" No keyword matches - returning all documents as fallback");
     return documents.slice(0, 5);
   }
 
   return topDocs;
 }
 
-/**
- * ENHANCED GEMINI PROMPT with better instructions
- * Generates more accurate answers with proper citations
- */
 async function askGemini(question, contextChunks) {
   if (!contextChunks || contextChunks.length === 0) {
-    console.log("❌ No context provided to Gemini");
+    console.log(" No context provided to Gemini");
     return "No documents available to answer your question. Please upload documents first.";
   }
 
-  console.log(`🤖 Asking Gemini with ${contextChunks.length} document(s)`);
+  console.log(`Asking Gemini with ${contextChunks.length} document(s)`);
 
-  // Build structured context with clear document boundaries
   const context = contextChunks
     .map((chunk, idx) => {
       const docName = chunk.docName || chunk.name || `Document ${idx + 1}`;
-      const text = (chunk.text || "").substring(0, 4000); // Limit per doc to stay within token limits
+      const text = (chunk.text || "").substring(0, 4000);
       return `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 DOCUMENT ${idx + 1}: ${docName}
@@ -167,7 +147,7 @@ YOUR ANSWER (with document citations):`;
     const model = genAI.getGenerativeModel({
       model: "gemini-2.5-flash-lite",
       generationConfig: {
-        temperature: 0.3, // Lower = more factual
+        temperature: 0.3,
         topP: 0.8,
         topK: 40,
         maxOutputTokens: 1024,
@@ -179,26 +159,22 @@ YOUR ANSWER (with document citations):`;
     const response = await result.response;
     const answer = response.text().trim();
 
-    console.log(`✅ Gemini response generated (${answer.length} chars)`);
+    console.log(`Gemini response generated (${answer.length} chars)`);
     return answer;
   } catch (error) {
-    console.error("❌ Gemini API Error:", error.message);
+    console.error("Gemini API Error:", error.message);
 
-    // More specific error messages
     if (error.message?.includes("API key")) {
-      return "⚠️ API configuration error. Please check your Gemini API key.";
+      return " API configuration error. Please check your Gemini API key.";
     }
     if (error.message?.includes("quota")) {
-      return "⚠️ API quota exceeded. Please try again later.";
+      return "API quota exceeded. Please try again later.";
     }
 
     return "Sorry, the AI service encountered an error. Please try again in a moment.";
   }
 }
 
-/**
- * UTILITY: Validate document has searchable content
- */
 function validateDocument(doc) {
   if (!doc) return false;
   if (!doc.text || typeof doc.text !== "string") return false;
@@ -206,9 +182,6 @@ function validateDocument(doc) {
   return true;
 }
 
-/**
- * UTILITY: Get document statistics
- */
 function getDocumentStats(documents) {
   const valid = documents.filter(validateDocument);
   const totalChars = valid.reduce((sum, doc) => sum + doc.text.length, 0);

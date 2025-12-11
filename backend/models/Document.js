@@ -52,7 +52,6 @@ documentSchema.methods.isReady = function () {
   return this.status === "ready" && this.text && this.text.length > 0;
 };
 
-// Optional: Add a static method to get user's ready documents
 documentSchema.statics.findReadyByUser = function (userId) {
   return this.find({ userId, status: "ready" }).sort({ createdAt: -1 });
 };
