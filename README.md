@@ -73,13 +73,6 @@ npm start
 Open
 http://localhost:3000
 
-###### Observations & Explanation of Limitations During Implementation
-
-During the development of this, the core functionalities such as authentication, document upload, text extraction, storage in MongoDB, dashboard setup, chat-style querying, and AI-based answering using stored content were successfully implemented. However, the advanced RAG-based vector search pipeline could not be completed due to several practical limitations encountered during testing.
-Our main blocker was inconsistent text extraction from PDFs. Many documents produced noisy or partially unreadable text after parsing, which made chunking unreliable. Since embeddings depend fully on clean and structured text, the extracted content frequently caused invalid embeddings, leading to poor or meaningless semantic representations. When attempting batch embedding using available AI APIs, also faced repeated token-limit issues, unexpected rate-limit errors, and cost spikes, making the embedding pipeline unstable and non-repeatable within the given constraints.
-Because of these extraction and embedding failures, we were unable to generate a stable dataset of vectors to index in MongoDB Atlas. As a result, the vector search stage using $vectorSearch could not be activated or tested end-to-end. This forms the major limitation of the current system.
-Despite this, the implemented solution still meets the core requirements of the assignment. The system successfully extracts text, stores documents, answers questions strictly from stored content, and provides references and history. The vector-enhanced semantic search remains a future enhancement that requires more reliable extraction, stable chunking logic, and a controlled embedding pipeline.
-
 ### Database Schema Design (with Relationships)
 
 ```mermaid
@@ -90,7 +83,7 @@ erDiagram
 
     User {
         ObjectId _id PK
-        string email
+        string email UK
         string password
         date createdAt
         date updatedAt
@@ -100,15 +93,12 @@ erDiagram
         ObjectId _id PK
         ObjectId userId FK
         string name
-        string type "pdf/txt/docx"
+        string type "pdf | txt | docx"
         string text
-        string status "ready/processing"
+        string status "processing | ready | error"
         string filePath
         number fileSize
         date uploadedAt
-        array chunks {
-            string text
-        }
         date createdAt
         date updatedAt
     }
@@ -119,10 +109,14 @@ erDiagram
         ObjectId docId FK
         string question
         string answer
-        array references {
-            string docName
-            string excerpt
-        }
+        string references "Array of {docName, excerpt}"
         date timestamp
     }
 ```
+
+###### Observations & Explanation of Limitations During Implementation
+
+During the development of this, the core functionalities such as authentication, document upload, text extraction, storage in MongoDB, dashboard setup, chat-style querying, and AI-based answering using stored content were successfully implemented. However, the advanced RAG-based vector search pipeline could not be completed due to several practical limitations encountered during testing.
+Our main blocker was inconsistent text extraction from PDFs. Many documents produced noisy or partially unreadable text after parsing, which made chunking unreliable. Since embeddings depend fully on clean and structured text, the extracted content frequently caused invalid embeddings, leading to poor or meaningless semantic representations. When attempting batch embedding using available AI APIs, also faced repeated token-limit issues, unexpected rate-limit errors, and cost spikes, making the embedding pipeline unstable and non-repeatable within the given constraints.
+Because of these extraction and embedding failures, we were unable to generate a stable dataset of vectors to index in MongoDB Atlas. As a result, the vector search stage using $vectorSearch could not be activated or tested end-to-end. This forms the major limitation of the current system.
+Despite this, the implemented solution still meets the core requirements of the assignment. The system successfully extracts text, stores documents, answers questions strictly from stored content, and provides references and history. The vector-enhanced semantic search remains a future enhancement that requires more reliable extraction, stable chunking logic, and a controlled embedding pipeline.
