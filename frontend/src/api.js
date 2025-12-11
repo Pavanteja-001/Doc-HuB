@@ -1,10 +1,10 @@
-// frontend/src/api.js — FINAL PRODUCTION URL
+// frontend/src/api.js — FINAL WORKING VERSION
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://doc-hub-l8f7.onrender.com", // ← YOUR LIVE RENDER URL
+  baseURL: "https://doc-hub-l8f7.onrender.com", // ← YOUR LIVE BACKEND
   withCredentials: true,
-  timeout: 60000, // Handle Render cold starts
+  timeout: 90000,
 });
 
 export default API;
