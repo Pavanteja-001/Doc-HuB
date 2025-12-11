@@ -85,7 +85,7 @@ All routes are prefixed with:
 | -------- | --------------- | ------------- | -------------------------------------------- | --------------------------------- | ------------------------------------------- |
 | `POST`   | `/auth/signup`  | No            | Create new user                              | `{ email, password }`             | `{ token }`                                 |
 | `POST`   | `/auth/login`   | No            | Login user                                   | `{ email, password }`             | `{ token }`                                 |
-| `POST`   | `/docs/upload`  | Yes           | Upload PDF/TXT/DOCX + extract text           | `multipart/form-data` with `file` | `{ message, documentId, name, textLength }` |
+| `POST`   | `/docs/upload`  | Yes           | Upload PDF/TXT + extract text                | `multipart/form-data` with `file` | `{ message, documentId, name, textLength }` |
 | `GET`    | `/docs/list`    | Yes           | Get all user documents                       | -                                 | Array of documents                          |
 | `DELETE` | `/docs/:id`     | Yes           | Delete a document                            | Document ID in URL                | `{ message: "Deleted successfully" }`       |
 | `POST`   | `/docs/ask`     | Yes           | Ask AI question about all uploaded documents | `{ question }`                    | `{ answer, references[] }`                  |
