@@ -124,7 +124,7 @@ router.post("/upload", auth, upload.single("file"), async (req, res) => {
 
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
-      console.log("🗑️  Cleaned up temp file after error");
+      console.log("  Cleaned up temp file after error");
     }
 
     res.status(500).json({
@@ -134,9 +134,6 @@ router.post("/upload", auth, upload.single("file"), async (req, res) => {
   }
 });
 
-/**
- * ASK QUESTION - ENHANCED WITH STATS
- */
 router.post("/ask", auth, async (req, res) => {
   const { question } = req.body;
   if (!question?.trim())
@@ -150,11 +147,11 @@ router.post("/ask", auth, async (req, res) => {
       status: "ready",
     });
 
-    console.log(`📚 Found ${userDocs.length} ready documents`);
+    console.log(`Found ${userDocs.length} ready documents`);
 
     // Get document statistics
     const stats = getDocumentStats(userDocs);
-    console.log(`📊 Document stats:`, stats);
+    console.log(`Document stats:`, stats);
 
     if (userDocs.length === 0) {
       return res.json({
@@ -179,7 +176,7 @@ router.post("/ask", auth, async (req, res) => {
       docName: doc.name,
     }));
 
-    console.log(`📤 Sending ${contextChunks.length} documents to AI`);
+    console.log(`Sending ${contextChunks.length} documents to AI`);
 
     const answer = await askGemini(question, contextChunks);
 
@@ -197,11 +194,11 @@ router.post("/ask", auth, async (req, res) => {
       references,
     });
     await history.save();
-    console.log("💾 Saved to query history\n");
+    console.log("Saved to query history\n");
 
     res.json({ answer, references });
   } catch (err) {
-    console.error("❌ Ask error:", err);
+    console.error(" Ask error:", err);
     res.status(500).json({ error: "Failed to process question" });
   }
 });
@@ -215,7 +212,7 @@ router.get("/list", auth, async (req, res) => {
       .select("name type status createdAt fileSize") // Don't send full text to frontend
       .sort({ createdAt: -1 });
 
-    console.log(`📋 Listed ${docs.length} documents for user ${req.userId}`);
+    console.log(`Listed ${docs.length} documents for user ${req.userId}`);
     res.json(docs);
   } catch (err) {
     console.error("❌ List error:", err);

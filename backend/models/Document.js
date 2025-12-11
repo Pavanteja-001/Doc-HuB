@@ -41,11 +41,10 @@ const documentSchema = new mongoose.Schema(
     ],
   },
   {
-    timestamps: true, // Adds createdAt and updatedAt automatically
+    timestamps: true,
   }
 );
 
-// Index for faster queries
 documentSchema.index({ userId: 1, createdAt: -1 });
 documentSchema.index({ userId: 1, status: 1 });
 

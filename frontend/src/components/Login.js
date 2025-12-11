@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import axios from "axios";
+
 import { useNavigate, Link } from "react-router-dom";
+import API from "../api";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -13,8 +14,8 @@ const Login = () => {
     setMsg("");
 
     try {
-      const res = await axios.post(
-        "http://localhost:5001/auth/login",
+      const res = await API.post(
+        "/auth/login",
         { email, password },
         { withCredentials: true }
       );
