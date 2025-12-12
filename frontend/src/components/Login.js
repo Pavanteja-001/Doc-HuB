@@ -42,6 +42,7 @@ const Login = () => {
           <input
             name="email"
             id="email"
+            autocomplete="email"
             className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500"
             type="email"
             placeholder="Email"
@@ -53,6 +54,7 @@ const Login = () => {
           <input
             name="password"
             id="password"
+            autocomplete="current-password"
             className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500"
             type="password"
             placeholder="Password"
