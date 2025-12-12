@@ -14,7 +14,7 @@ const Signup = () => {
     setMsg("");
 
     try {
-      const response = await API.post(
+      await API.post(
         "/auth/signup",
         { email, password },
         {
@@ -26,7 +26,6 @@ const Signup = () => {
         }
       );
 
-      console.log("Signup success:", response.data); // Debug line
       setMsg("Account created! Redirecting to login...");
       setTimeout(() => navigate("/login"), 2000);
     } catch (err) {

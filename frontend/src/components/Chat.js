@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-
 import { Link } from "react-router-dom";
 import API from "../api";
 
@@ -52,7 +51,7 @@ const Chat = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
       <div className="max-w-4xl mx-auto p-6">
-        {/* HEADER: APP NAME & BACK TO DASHBOARD LINK  */}
+        {/* HEADER */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 flex justify-between items-center">
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
@@ -82,7 +81,6 @@ const Chat = () => {
             Back to Dashboard
           </Link>
         </div>
-        {/* END HEADER  */}
 
         {/* Chat Container */}
         <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col h-96 md:h-[600px]">
@@ -128,32 +126,51 @@ const Chat = () => {
                     {msg.text}
                   </p>
 
-                  {/* UPDATED: Display References with Excerpt */}
+                  {/* UPDATED: Display Only Used Sources with Exact Lines */}
                   {msg.type === "bot" &&
                     msg.references &&
                     msg.references.length > 0 && (
                       <div className="mt-4 pt-4 border-t border-gray-300">
-                        <p className="text-xs font-semibold mb-2 text-gray-700">
+                        <p className="text-xs font-semibold mb-3 text-gray-700 flex items-center gap-2">
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            />
+                          </svg>
                           Sources Used:
                         </p>
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                           {msg.references.map((ref, idx) => (
                             <div
                               key={idx}
-                              className="p-3 bg-gray-50 rounded-lg border border-gray-200"
+                              className="p-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-200 hover:shadow-md transition"
                             >
-                              <strong className="text-sm text-indigo-700">
-                                {ref.docName}
-                              </strong>
-                              <p className="text-xs text-gray-600 mt-1 italic">
-                                "{ref.excerpt}"
-                              </p>
+                              <div className="flex items-start gap-2 mb-2">
+                                <span className="bg-indigo-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                  {idx + 1}
+                                </span>
+                                <strong className="text-sm text-indigo-700 break-words">
+                                  📄 {ref.docName}
+                                </strong>
+                              </div>
+                              <div className="ml-7 bg-white p-2 rounded border-l-4 border-indigo-400">
+                                <p className="text-xs text-gray-700 italic leading-relaxed">
+                                  "{ref.excerpt}"
+                                </p>
+                              </div>
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
-                  {/* END UPDATED REFERENCE SECTION */}
                 </div>
               </div>
             ))}

@@ -30,11 +30,11 @@ function simpleSearch(query, documents) {
     .filter((w) => w.length > 2 && !stopWords.has(w));
 
   if (words.length === 0) {
-    console.log(" No meaningful keywords extracted from query");
+    console.log("No meaningful keywords extracted from query");
     return documents.slice(0, 5);
   }
 
-  console.log(` Searching for keywords: [${words.join(", ")}]`);
+  console.log(`Searching for keywords: [${words.join(", ")}]`);
 
   const scoredDocs = documents
     .map((doc) => {
@@ -66,7 +66,7 @@ function simpleSearch(query, documents) {
           const wordScore = Math.min(matches * 15, 150);
           score += wordScore;
           console.log(
-            ` Keyword "${word}" found ${matches}x in ${doc.name}: +${wordScore}`
+            `Keyword "${word}" found ${matches}x in ${doc.name}: +${wordScore}`
           );
         }
       });
@@ -79,7 +79,7 @@ function simpleSearch(query, documents) {
           const maxDistance = Math.max(...positions) - Math.min(...positions);
           if (maxDistance < 500) {
             score += 50;
-            console.log(` Keywords clustered in ${doc.name}: +50`);
+            console.log(`Keywords clustered in ${doc.name}: +50`);
           }
         }
       }
@@ -97,7 +97,7 @@ function simpleSearch(query, documents) {
   const topDocs = scoredDocs.slice(0, 5).map((item) => item.doc);
 
   if (topDocs.length === 0) {
-    console.log(" No keyword matches - returning all documents as fallback");
+    console.log("No keyword matches - returning all documents as fallback");
     return documents.slice(0, 5);
   }
 
@@ -106,8 +106,12 @@ function simpleSearch(query, documents) {
 
 async function askGemini(question, contextChunks) {
   if (!contextChunks || contextChunks.length === 0) {
-    console.log(" No context provided to Gemini");
-    return "No documents available to answer your question. Please upload documents first.";
+    console.log("No context provided to Gemini");
+    return {
+      answer:
+        "No documents available to answer your question. Please upload documents first.",
+      usedSources: [],
+    };
   }
 
   console.log(`Asking Gemini with ${contextChunks.length} document(s)`);
@@ -130,9 +134,13 @@ ${text}
 STRICT RULES:
 1. Answer ONLY using information explicitly stated in the documents below
 2. If the information is not in the documents, respond: "I cannot find this information in the uploaded documents."
-3. Always cite which document(s) you used: "According to [Document Name]..."
-4. Be specific and quote key phrases when relevant
-5. If documents conflict, mention both perspectives
+3. **CRITICAL**: After your answer, you MUST include a section called "SOURCES USED:" that lists:
+   - The EXACT document name that you used (e.g., "report.pdf" or "notes.txt")
+   - A verbatim quote or excerpt (20-50 words) from that document that supports your answer
+4. Format the sources section like this:
+   SOURCES USED:
+   [Document Name]: "exact quote from the document"
+5. If you use multiple documents, list each one separately
 6. Keep answers concise but complete (2-4 sentences ideal)
 
 ${context}
@@ -141,7 +149,7 @@ ${context}
 USER QUESTION: ${question}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-YOUR ANSWER (with document citations):`;
+YOUR ANSWER (with document citations and SOURCES USED section):`;
 
   try {
     const model = genAI.getGenerativeModel({
@@ -157,21 +165,83 @@ YOUR ANSWER (with document citations):`;
     console.log("⏳ Generating response...");
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const answer = response.text().trim();
+    const fullText = response.text().trim();
 
-    console.log(`Gemini response generated (${answer.length} chars)`);
-    return answer;
+    console.log(`Gemini response generated (${fullText.length} chars)`);
+
+    // Parse the response to extract answer and sources
+    const sourcesMatch = fullText.match(/SOURCES USED:([\s\S]*?)$/i);
+    let answer = fullText;
+    let usedSources = [];
+
+    if (sourcesMatch) {
+      // Split answer and sources
+      answer = fullText.substring(0, sourcesMatch.index).trim();
+      const sourcesText = sourcesMatch[1].trim();
+
+      // Parse sources - looking for pattern: [Document Name]: "quote"
+      const sourceLines = sourcesText.split("\n").filter((line) => line.trim());
+
+      sourceLines.forEach((line) => {
+        // Match patterns like: document.pdf: "quote" or [document.pdf]: "quote"
+        const match = line.match(/\[?([^\]]+?)\]?\s*:\s*[""](.+?)[""]?$/);
+        if (match) {
+          const docName = match[1].trim();
+          const excerpt = match[2].trim();
+
+          // Find matching document from contextChunks
+          const matchingDoc = contextChunks.find(
+            (chunk) =>
+              chunk.docName.toLowerCase().includes(docName.toLowerCase()) ||
+              docName.toLowerCase().includes(chunk.docName.toLowerCase())
+          );
+
+          if (matchingDoc) {
+            usedSources.push({
+              docName: matchingDoc.docName,
+              excerpt: excerpt,
+            });
+          }
+        }
+      });
+    }
+
+    // If no sources were parsed, fall back to all provided documents
+    if (usedSources.length === 0) {
+      console.log("⚠️ No sources parsed from response, using all context docs");
+      usedSources = contextChunks.map((chunk) => ({
+        docName: chunk.docName,
+        excerpt: chunk.text.substring(0, 150).trim() + "...",
+      }));
+    }
+
+    console.log(`✓ Parsed ${usedSources.length} source(s) from response`);
+
+    return {
+      answer,
+      usedSources,
+    };
   } catch (error) {
     console.error("Gemini API Error:", error.message);
 
     if (error.message?.includes("API key")) {
-      return " API configuration error. Please check your Gemini API key.";
+      return {
+        answer: "❌ API configuration error. Please check your Gemini API key.",
+        usedSources: [],
+      };
     }
     if (error.message?.includes("quota")) {
-      return "API quota exceeded. Please try again later.";
+      return {
+        answer: "❌ API quota exceeded. Please try again later.",
+        usedSources: [],
+      };
     }
 
-    return "Sorry, the AI service encountered an error. Please try again in a moment.";
+    return {
+      answer:
+        "Sorry, the AI service encountered an error. Please try again in a moment.",
+      usedSources: [],
+    };
   }
 }
 
