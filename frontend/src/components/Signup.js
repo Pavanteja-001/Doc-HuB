@@ -55,6 +55,8 @@ const Signup = () => {
 
         <form onSubmit={handleSignup} className="space-y-5">
           <input
+            name="email"
+            id="signup-email"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
             type="email"
             placeholder="Email"
@@ -62,7 +64,10 @@ const Signup = () => {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+
           <input
+            name="password"
+            id="signup-password"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
             type="password"
             placeholder="Password"
@@ -70,6 +75,7 @@ const Signup = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+
           <button
             type="submit"
             className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-bold py-3 rounded-lg hover:from-green-600 hover:to-green-700 transition"

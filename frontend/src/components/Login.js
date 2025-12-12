@@ -40,6 +40,8 @@ const Login = () => {
         )}
         <form onSubmit={handleLogin} className="space-y-5">
           <input
+            name="email"
+            id="email"
             className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500"
             type="email"
             placeholder="Email"
@@ -47,7 +49,10 @@ const Login = () => {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+
           <input
+            name="password"
+            id="password"
             className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500"
             type="password"
             placeholder="Password"
@@ -55,6 +60,7 @@ const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+
           <button
             type="submit"
             className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-3 rounded-lg hover:from-blue-600 hover:to-blue-700"
