@@ -22,15 +22,25 @@ const Login = () => {
       const res = await API.post(
         "/auth/login",
         { email, password },
-        { withCredentials: true }
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
       );
 
       localStorage.setItem("token", res.data.token);
-      navigate("/dashboard");
+
+      // Add success message and delay like Signup
+      setMsg("Login successful! Redirecting...");
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1000);
     } catch (err) {
+      console.error("Login error:", err.response || err);
       setMsg(err.response?.data?.error || "Invalid credentials");
-    } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Only reset loading on error
     }
   };
 
@@ -41,16 +51,22 @@ const Login = () => {
           Login
         </h2>
         {msg && (
-          <div className="bg-red-100 text-red-700 p-3 rounded mb-6 text-center">
+          <div
+            className={`text-center p-3 rounded mb-6 font-medium ${
+              msg.includes("successful")
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
             {msg}
           </div>
         )}
         <form onSubmit={handleLogin} autoComplete="on" className="space-y-5">
           <input
-            id="email"
             name="email"
+            id="login-email"
             autoComplete="email"
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             type="email"
             placeholder="Email"
             value={email}
@@ -60,10 +76,10 @@ const Login = () => {
           />
 
           <input
-            id="password"
             name="password"
+            id="login-password"
             autoComplete="current-password"
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             type="password"
             placeholder="Password"
             value={password}
