@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import { useNavigate, Link } from "react-router-dom";
 import API from "../api";
 
@@ -7,11 +6,17 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    // Prevent multiple submissions
+    if (isLoading) return;
+
     setMsg("");
+    setIsLoading(true);
 
     try {
       const res = await API.post(
@@ -24,6 +29,8 @@ const Login = () => {
       navigate("/dashboard");
     } catch (err) {
       setMsg(err.response?.data?.error || "Invalid credentials");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -41,13 +48,14 @@ const Login = () => {
         <form onSubmit={handleLogin} autoComplete="on" className="space-y-5">
           <input
             id="email"
-            name="username"
-            autoComplete="username"
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500"
+            name="email"
+            autoComplete="email"
+            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            disabled={isLoading}
             required
           />
 
@@ -55,19 +63,21 @@ const Login = () => {
             id="password"
             name="password"
             autoComplete="current-password"
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500"
+            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            disabled={isLoading}
             required
           />
 
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-3 rounded-lg hover:from-blue-600 hover:to-blue-700"
+            disabled={isLoading}
+            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
-            Login
+            {isLoading ? "Logging in..." : "Login"}
           </button>
         </form>
         <p className="mt-6 text-center text-gray-600">
