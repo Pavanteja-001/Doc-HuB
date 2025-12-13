@@ -38,11 +38,11 @@ const Login = () => {
             {msg}
           </div>
         )}
-        <form onSubmit={handleLogin} className="space-y-5">
+        <form onSubmit={handleLogin} autoComplete="on" className="space-y-5">
           <input
-            name="email"
             id="email"
-            autoComplete="email"
+            name="username"
+            autoComplete="username"
             className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500"
             type="email"
             placeholder="Email"
@@ -52,8 +52,8 @@ const Login = () => {
           />
 
           <input
-            name="password"
             id="password"
+            name="password"
             autoComplete="current-password"
             className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500"
             type="password"
