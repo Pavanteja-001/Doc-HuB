@@ -11,8 +11,6 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    // Prevent multiple submissions
     if (isLoading) return;
 
     setMsg("");
@@ -23,24 +21,22 @@ const Login = () => {
         "/auth/login",
         { email, password },
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           withCredentials: true,
         }
       );
 
       localStorage.setItem("token", res.data.token);
-
-      // Add success message and delay like Signup
       setMsg("Login successful! Redirecting...");
+
+      // Use window.location for full page reload to update App.js token check
       setTimeout(() => {
-        navigate("/dashboard");
-      }, 1000);
+        window.location.href = "/dashboard";
+      }, 800);
     } catch (err) {
       console.error("Login error:", err.response || err);
       setMsg(err.response?.data?.error || "Invalid credentials");
-      setIsLoading(false); // Only reset loading on error
+      setIsLoading(false);
     }
   };
 
